@@ -195,7 +195,7 @@ for (let i = 0; i < projectItems.length; i++) {
 
     // Fetch and parse markdown
     try {
-      const response = await fetch(`./projects-md/${fileName}.md`);
+      const response = await fetch(`./projects/${fileName}/${fileName}.md`);
       if (!response.ok) throw new Error("File not found");
       const text = await response.text();
       markdownContainer.innerHTML = marked.parse(text);
@@ -215,6 +215,69 @@ projectDetailsBackBtn?.addEventListener("click", function () {
       pages[j].classList.add("active");
       for (let k = 0; k < navigationLinks.length; k++) {
         if (navigationLinks[k].innerHTML.toLowerCase() === "portfolio") {
+           navigationLinks[k].classList.add("active");
+        }
+      }
+    }
+  }
+  window.scrollTo(0, 0);
+});
+
+// tutorial details fetch routing
+const tutorialDetailsArticle = document.querySelector("[data-page='tutorial-details']");
+const tutorialItems = document.querySelectorAll("[data-tutorial-file]");
+const tutorialContainer = document.querySelector("[data-tutorial-container]");
+const tutorialDetailsBackBtn = document.querySelector("[data-tutorial-details-back]");
+const tutorialPageTitle = document.querySelector("[data-tutorial-page-title]");
+
+for (let i = 0; i < tutorialItems.length; i++) {
+  tutorialItems[i].addEventListener("click", async function (e) {
+    e.preventDefault();
+    
+    const fileName = this.dataset.tutorialFile;
+    const tutorialTitle = this.querySelector(".blog-item-title").innerText;
+    
+    if (!fileName) {
+      alert("Tutorial details not available yet.");
+      return;
+    }
+
+    // Set title and loading text
+    tutorialPageTitle.innerText = tutorialTitle;
+    tutorialContainer.innerHTML = "<p>Loading tutorial details...</p>";
+
+    // Hide all other pages
+    for (let j = 0; j < pages.length; j++) {
+      pages[j].classList.remove("active");
+      navigationLinks[j]?.classList.remove("active");
+    }
+
+    // Show tutorial details page
+    tutorialDetailsArticle.classList.add("active");
+    window.scrollTo(0, 0);
+
+    // Fetch and parse markdown
+    try {
+      const response = await fetch(`./tutorials/${fileName}/${fileName}.md`);
+      if (!response.ok) throw new Error("File not found");
+      const text = await response.text();
+      tutorialContainer.innerHTML = marked.parse(text);
+    } catch (error) {
+      tutorialContainer.innerHTML = `<p>Error loading tutorial details: ${error.message}. Please try again later.</p>`;
+    }
+  });
+}
+
+// Back button functionality for Tutorials
+tutorialDetailsBackBtn?.addEventListener("click", function () {
+  tutorialDetailsArticle.classList.remove("active");
+  
+  // Reactivate tutorials page
+  for (let j = 0; j < pages.length; j++) {
+    if (pages[j].dataset.page === "tutorials") {
+      pages[j].classList.add("active");
+      for (let k = 0; k < navigationLinks.length; k++) {
+        if (navigationLinks[k].innerHTML.toLowerCase() === "tutorials") {
            navigationLinks[k].classList.add("active");
         }
       }
